@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
-const connection = mongoose.createConnection('mongodb://192.168.0.25:27017/Project_TG').on('open',()=>{
+// Obtener la URL de MongoDB desde una variable de entorno
+const mongodbUrl = process.env.MONGODB_URL;
+
+const connection = mongoose.createConnection(mongodbUrl).on('open',()=>{
     console.log("MongoDB Connected");
 }).on('error',()=>{
     console.log("MongoDB connection error");
