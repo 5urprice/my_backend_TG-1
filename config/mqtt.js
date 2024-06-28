@@ -2,43 +2,35 @@ const EstabilidadDataModel = require('../model/BMI160.model');
 const SPO2DataModel = require('../model/SPO2.model');
 const BPMDataModel = require('../model/BPM.model');
 const MqttDataModel = require('../model/mqtt.model');
-const mqtt = require('mqtt')
+const mqtt = require('mqtt');
 
-const protocol = 'mqtt'
-const host = '192.168.0.25'
-const port = '1883'
-const clientId = `mqtt_${Math.random().toString(16).slice(3)}`
+// Obtener la URL de EMQX desde una variable de entorno
+const emqxUrl = process.env.EMQX_URL;
 
-const connectUrl = `${protocol}://${host}:${port}`
+const protocol = 'mqtt';
+const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 
-const client = mqtt.connect(connectUrl, {
+const client = mqtt.connect(emqxUrl, {
     clientId,
     clean: true,
     connectTimeout: 4000,
     username: 'emqx_nodejs',
     password: 'public',
     reconnectPeriod: 1000,
-})
+});
 
-const topic = 'esp32/sensor_data'
+const topic = 'esp32/sensor_data';
 const estabilidadTopic = 'esp32/estabilidad_data';
-const bpmTopic = 'esp32/bpm_data'
-const spo2Topic = 'esp32/spo2_data'
-
+const bpmTopic = 'esp32/bpm_data';
+const spo2Topic = 'esp32/spo2_data';
 
 client.on('connect', () => {
-    console.log('EMQX is Connected')
+    console.log('EMQX is Connected');
 
     client.subscribe([topic, estabilidadTopic, bpmTopic, spo2Topic], () => {
-        console.log(`Subscribe to topics '${topic}' and '${estabilidadTopic}'and '${bpmTopic}' and '${spo2Topic}'`);
-        //console.log(`Subscribe to topic '${topic}'`)
-        // client.publish(topic, 'nodejs mqtt test1', {qos: 0, retain: false}, (error) => {
-        //     if (error) {
-        //         console.error(error)
-        //     }
-        // })
-    })
-})
+        console.log(`Subscribe to topics '${topic}', '${estabilidadTopic}', '${bpmTopic}' and '${spo2Topic}'`);
+    });
+});
 
 client.on('message', (topic, payload) => {
     const message = payload.toString();
